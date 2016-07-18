@@ -1,0 +1,8 @@
+---
+
+- name: Restart php-fpm
+  command: systemctl restart php-fpm.service
+
+
+- name: Restart nginx
+  command: systemctl restart nginx.service

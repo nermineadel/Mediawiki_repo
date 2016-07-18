@@ -1,0 +1,4 @@
+---
+DB_name: mediawiki_db
+DB_user: mediawiki
+user_password: password

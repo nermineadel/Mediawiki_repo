@@ -1,0 +1,64 @@
+---
+
+- name: Install Nginx and associated packages  #from epel repo
+  yum: name=nginx state=latest
+
+- name: Automatic load when boot
+  command: systemctl enable nginx.service
+
+- name: Determine user to run nginx server
+  lineinfile:
+   dest: /etc/nginx/nginx.conf
+   regexp: '^user  nginx;'
+   line: 'user {{ proj_owner }};'
+   backrefs: yes 
+
+- name: Create sites-available and sites-enabled directories
+  file:
+    path: /etc/nginx/{{ item }}
+    state: directory
+  with_items: 
+   - sites-available
+   - sites-enabled
+
+- name: Copy nginx configuration for mediawiki
+  template: src=mediawiki.conf dest=/etc/nginx/sites-available/
+    
+  
+- name: Link avaible sites with our enabled sites
+  file: 
+   src: /etc/nginx/sites-available/mediawiki.conf 
+   dest: /etc/nginx/sites-enabled/mediawiki.conf 
+   state: link
+
+- name: Include sites-enabled in nginx main config file instead of default.conf
+  lineinfile:
+   dest: /etc/nginx/nginx.conf
+   insertbefore: "^}"
+   line: "\ \ \ \ include /etc/nginx/sites-enabled/*;"
+
+
+- name:  Delete server block from the main nginx configuration file
+  lineinfile:
+   dest: /etc/nginx/nginx.conf
+   regexp: "{{ item }}" 
+   state: absent
+  with_items:
+  #- '^    include .*'  
+  - "^    include /etc/nginx/conf.d/\\*.conf;" 
+  - "^    server {" 
+  - "^        listen .*" 
+  - "^        listen       80 default_server;"
+  - '^        listen       [::]:80 default_server;'
+  - "^        server_name  _;"
+  - "^        root         /usr/share/nginx/html;"
+  - "^        # Load configuration files for the default server block."
+  - "^        include /etc/nginx/default.d/\\*.conf;"
+  - "^        location / {"
+  - "^        }"
+  - "^        error_page 404 /404.html;"
+  - "^            location = /40x.html {"
+  - "^        error_page 500 502 503 504 /50x.html;"
+  - "^            location = /50x.html {"
+  - "^    }"
+

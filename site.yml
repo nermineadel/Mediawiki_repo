@@ -1,0 +1,19 @@
+---
+
+
+
+- hosts: mediawiki_hosts
+  remote_user: root
+
+
+
+  roles:
+    #- swap
+    - update
+    - common
+    - nginx
+    - php
+    - mysql
+    - mediawiki
+
+  

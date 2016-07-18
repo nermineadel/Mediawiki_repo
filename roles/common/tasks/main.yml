@@ -1,0 +1,28 @@
+---
+- name: Install Epel repository
+  yum: name=epel-release state=present
+
+
+- name: Install software collections repository  #for php5.5
+  yum: name=centos-release-scl state=present
+
+- name: Install wget
+  yum: name=wget state=present
+
+- name: Install Git
+  yum: name=git state=present
+
+- name: Install VIM
+  yum: name=vim state=present
+
+- name: Install Net tools
+  yum: name=net-tools state=present
+
+- name: Install firewalld
+  yum: name=firewalld state=present
+
+- name: Install deltarpm
+  yum: name=deltarpm state=present   
+
+
+#Delta RPM packages contain the difference between an old and a new version of an RPM package. Applying a delta RPM on an old RPM results in the complete new RPM

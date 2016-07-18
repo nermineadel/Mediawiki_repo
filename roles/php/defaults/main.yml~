@@ -1,0 +1,4 @@
+---
+nginx_repository: http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
+limesurvey_projpath: /var/www/limesurvey
+proj_owner: www-data

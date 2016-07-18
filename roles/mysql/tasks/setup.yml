@@ -1,0 +1,14 @@
+---
+
+- name: Install mysql server
+  yum: name={{ item }} state=installed update_cache=yes 
+  with_items: 
+   - mysql-server
+   - mysql
+   - MySQL-python
+
+- name: start mysqld
+  command: systemctl start mysqld  
+
+
+

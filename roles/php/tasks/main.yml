@@ -1,0 +1,85 @@
+---
+
+- name: Install PHP and associated packages
+  yum: name={{ item }} state=latest  enablerepo=centos-sclo-rh
+  with_items: 
+   - php55-php-gd 
+   - php55-php-fpm
+   - php55-php-mysql
+   - php55-php-common
+   - php55-php-devel
+   - php55-php-cli
+   - php55-php-cgi
+   - php55-php-xml
+   - php55-php-intl
+   - php55-php-mbstring
+  notify:
+    - Restart Nginx
+
+- name: Change settings in default php.ini file 
+  lineinfile: 
+   dest: /opt/rh/php55/root/etc/php.ini
+   regexp: "short_open_tag = Off"
+   line: "short_open_tag = On"
+   backrefs: yes
+
+- name: Change settings in default php.ini file 
+  lineinfile: 
+   dest: /opt/rh/php55/root/etc/php.ini
+   regexp: ";cgi.fix_pathinfo=1"
+   line: "cgi.fix_pathinfo=0"
+   backrefs: yes
+
+- name: Change settings in www.conf file to listen on socket file 
+  lineinfile: 
+   dest: /opt/rh/php55/root/etc/php-fpm.d/www.conf
+   regexp: "^listen = 127.0.0.1:9000"
+   line: "listen = /opt/rh/php55/root/var/run/php-fpm/php-fpm.sock"
+   backrefs: yes
+
+
+
+- name: Change settings in www.conf file to set user
+  lineinfile: 
+   dest: /opt/rh/php55/root/etc/php-fpm.d/www.conf
+   regexp: "^user = apache"
+   line: "user = {{ proj_owner }}"
+   backrefs: yes
+
+- name: Change settings in www.conf file to set group 
+  lineinfile: 
+   dest: /opt/rh/php55/root/etc/php-fpm.d/www.conf
+   regexp: "^group = apache"
+   line: "group = {{ proj_grp }}"
+   backrefs: yes
+
+- name: Change settings in www.conf file to set listen.owner
+  lineinfile: 
+   dest: /opt/rh/php55/root/etc/php-fpm.d/www.conf
+   regexp: ";listen.owner = nobody"
+   line: "listen.owner = {{ proj_owner }}"
+   backrefs: yes
+
+- name: Change settings in www.conf file to set listen.group 
+  lineinfile: 
+   dest: /opt/rh/php55/root/etc/php-fpm.d/www.conf
+   regexp: ";listen.group = nobody"
+   line: "listen.group = {{ proj_grp }}"
+   backrefs: yes
+
+- name: Change settings in www.conf file to set listen.mode 
+  lineinfile: 
+   dest: /opt/rh/php55/root/etc/php-fpm.d/www.conf
+   regexp: ";listen.mode = 0666"
+   line: "listen.mode = 0666"
+   backrefs: yes
+
+   
+
+- name: Be sure php-fpm is running and enable
+  command: systemctl start php55-php-fpm.service
+
+- name: Automatic load when boot
+  command: systemctl enable php55-php-fpm.service
+
+   

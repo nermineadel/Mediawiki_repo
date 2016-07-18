@@ -1,0 +1,63 @@
+---
+- name: Create directory /var/www
+  file: 
+   path: "{{ proj_parent_path }}" 
+   state: directory
+
+- name: Create directory /var/www/mediawiki
+  file: 
+   path: "{{ mediawiki_projpath }}" 
+   state: directory
+
+
+- name: Download mediawiki package 
+  command: wget https://releases.wikimedia.org/mediawiki/1.27/mediawiki-1.27.0.tar.gz chdir=/var/www/ creates=/var/www/mediawiki-1.27.0.tar.gz
+
+  # get_url:
+  #  url: https://releases.wikimedia.org/mediawiki/1.27/mediawiki-1.27.0.tar.gz
+  #  dest: /var/www
+  #  timeout: 2000
+
+- name: extract mediawiki 
+  unarchive: 
+   src: /var/www/mediawiki-1.27.0.tar.gz
+   dest: "{{ mediawiki_projpath }}"
+   copy: no
+
+
+- name: Change owner and group and persmissions of the project root path
+  file: 
+   path: "{{ mediawiki_projpath }}"
+   mode: 0755
+   state: directory
+   owner: "{{ proj_owner }}"
+   group: "{{ proj_grp }}"
+   recurse: yes
+
+- name: copy LocalSettings.php to root path
+  template: src=LocalSettings.php dest={{ root_path }}
+
+- name: Change owner and group and persmissions of the /opt/rh/php55/root/var/lib/php/session/ directory
+  file: 
+   path:  /opt/rh/php55/root/var/lib/php/session/
+   mode: 0755
+   state: directory
+   owner: "{{ proj_owner }}"
+   group: "{{ proj_grp }}"
+   recurse: yes   
+
+- name: Restarting nginx 
+  command: systemctl restart nginx.service
+
+
+- name: To allow nginx to serve /var/www directory through selinux
+  command: chcon -Rt httpd_sys_content_t /var/www
+
+- name: Starting firewalld 
+  command: systemctl start firewalld
+  
+- name: Enable both the https and http services in firewall
+  shell: 'firewall-cmd --add-service=http'
+
+- name: Enable both the https and http services in firewall
+  shell: 'firewall-cmd --add-service=https'

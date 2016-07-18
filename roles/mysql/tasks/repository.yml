@@ -1,0 +1,18 @@
+---
+
+- name: Download the Yum Repo package of MySQL
+  get_url: 
+   url: http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm
+   dest: .
+   timeout: 1000
+
+- name: Install mysql-community-release-el7-5.noarch.rpm package
+  yum: pkg=mysql-community-release-el7-5.noarch.rpm state=installed update_cache=yes
+
+- name: Update cache
+  yum:  name=* state=latest update_cache=yes  
+
+
+ 
+
+  

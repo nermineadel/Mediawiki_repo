@@ -1,0 +1,22 @@
+---
+ 
+- name: Create the mediawiki database
+  mysql_db: 
+   name:  "{{ DB_name }}"
+   state: present
+ 
+
+- name: Create the mediawiki user
+  mysql_user: 
+    name: "{{ DB_user }}" 
+    password:  "{{ user_password }}"
+    host: localhost 
+    priv:  mediawiki_db.*:ALL
+  
+
+
+   
+  
+
+
+    

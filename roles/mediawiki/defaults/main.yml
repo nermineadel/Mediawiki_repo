@@ -1,0 +1,6 @@
+---
+proj_parent_path: /var/www
+mediawiki_projpath: /var/www/mediawiki
+root_path: /var/www/mediawiki/mediawiki-1.27.0
+proj_owner: nginx
+proj_grp: nginx
